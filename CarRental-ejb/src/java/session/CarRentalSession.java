@@ -6,9 +6,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import javax.ejb.Stateful;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import rental.CarRentalCompany;
 import rental.CarType;
 import rental.Quote;
-import rental.RentalStore;
 import rental.Reservation;
 import rental.ReservationConstraints;
 import rental.ReservationException;
@@ -17,9 +19,12 @@ import rental.ReservationException;
 public class CarRentalSession implements CarRentalSessionRemote {
 
     private String renter;
-    private List<Quote> quotes = new LinkedList<Quote>();
+    private List<Quote> allQuotes = new LinkedList<Quote>();
+    
+    @PersistenceContext
+    private EntityManager em;
 
-    @Override
+    /*@Override
     public Set<String> getAllRentalCompanies() {
         return new HashSet<String>(RentalStore.getRentals().keySet());
     }
@@ -38,6 +43,7 @@ public class CarRentalSession implements CarRentalSessionRemote {
 
     @Override
     public Quote createQuote(String company, ReservationConstraints constraints) throws ReservationException {
+        
         try {
             Quote out = RentalStore.getRental(company).createQuote(constraints, renter);
             quotes.add(out);
@@ -74,6 +80,50 @@ public class CarRentalSession implements CarRentalSessionRemote {
         }
         renter = name;
     }
-    
+    */
+
+    @Override
+    public void setRenterName(String name) {
+        this.renter = name;
+    }
+
+    @Override
+    public String getCheapestCarType(Date start, Date end, String region) throws Exception {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public List<CarType> getAvailableCarTypes(Date start, Date end) {
+        List<CarRentalCompany> allCompanies = em.createQuery("SELECT company FROM CarRentalCompany rentalCompany").getResultList();
+        Set<CarType> allTypes = new HashSet<CarType>();
+        for(CarRentalCompany rentalcompany : allCompanies) {
+            for(CarType cartype : rentalcompany.getAvailableCarTypes(start, end)) {
+                allTypes.add(cartype);
+            }
+        }
+        return new LinkedList<CarType>(allTypes);
+    }
+
+    @Override
+    public Quote createQuote(String company, ReservationConstraints constraints) throws ReservationException {
+        CarRentalCompany crc = em.find(CarRentalCompany.class, company);
+        Quote quote = crc.createQuote(constraints, renter);
+        allQuotes.add(quote);
+        return quote; 
+    }
+
+    @Override
+    public List<Reservation> confirmQuotes() throws ReservationException {
+        List<Reservation> confirmed = new LinkedList<Reservation>();
+        try {
+            for (Quote quote : allQuotes) {
+                CarRentalCompany crc = em.find(CarRentalCompany.class , quote.getRentalCompany());
+                confirmed.add(crc.confirmQuote(quote));
+            }
+        } catch (ReservationException exc) {
+            exc.printStackTrace();
+        }
+        return confirmed; 
+    }
     
 }
