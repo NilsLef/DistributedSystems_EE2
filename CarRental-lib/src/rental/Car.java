@@ -1,5 +1,6 @@
 package rental;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -13,7 +14,7 @@ import rental.CarType;
 import rental.Reservation;
 
 @Entity
-public class Car {
+public class Car implements Serializable {
     
     private int id;
     private CarType type;
