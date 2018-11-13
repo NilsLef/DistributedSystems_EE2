@@ -15,7 +15,7 @@ import rental.Reservation;
 
 @Entity
 public class Car implements Serializable {
-    
+    @Id
     private int id;
     private CarType type;
     private Set<Reservation> reservations;
@@ -23,6 +23,9 @@ public class Car implements Serializable {
     /***************
      * CONSTRUCTOR *
      ***************/
+    public Car() {
+        
+    }
     
     public Car(int uid, CarType type) {
     	this.id = uid;
@@ -33,9 +36,12 @@ public class Car implements Serializable {
     /******
      * ID *
      ******/
-    @Id @GeneratedValue
     public int getId() {
     	return id;
+    }
+    
+    public void setId(int ID) {
+        this.id = ID;
     }
     
     /************

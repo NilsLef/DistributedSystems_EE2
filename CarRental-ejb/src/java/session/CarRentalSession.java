@@ -17,12 +17,13 @@ import rental.ReservationException;
 
 @Stateful
 public class CarRentalSession implements CarRentalSessionRemote {
-
+    
+    //@PersistenceContext
+    private EntityManager em;
+    
     private String renter;
     private List<Quote> allQuotes = new LinkedList<Quote>();
-    
-    @PersistenceContext
-    private EntityManager em;
+
 
     /*@Override
     public Set<String> getAllRentalCompanies() {
@@ -89,12 +90,23 @@ public class CarRentalSession implements CarRentalSessionRemote {
 
     @Override
     public String getCheapestCarType(Date start, Date end, String region) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        String cheapest = "";
+        double price = 1000000;
+        List<CarRentalCompany> allCompanies = em.createQuery("SELECT name FROM CarRentalCompany name").getResultList();
+        for( CarRentalCompany crc : allCompanies) {
+            for(CarType cartype: crc.getAllTypes()) {
+                if (cartype.getRentalPricePerDay() < price) {
+                    cheapest = cartype.getName();
+                    price = cartype.getRentalPricePerDay();
+                }
+            }
+        }
+        return cheapest;
     }
 
     @Override
     public List<CarType> getAvailableCarTypes(Date start, Date end) {
-        List<CarRentalCompany> allCompanies = em.createQuery("SELECT company FROM CarRentalCompany rentalCompany").getResultList();
+        List<CarRentalCompany> allCompanies = em.createQuery("SELECT name FROM CarRentalCompany name").getResultList();
         Set<CarType> allTypes = new HashSet<CarType>();
         for(CarRentalCompany rentalcompany : allCompanies) {
             for(CarType cartype : rentalcompany.getAvailableCarTypes(start, end)) {

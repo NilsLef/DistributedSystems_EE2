@@ -27,6 +27,10 @@ public class CarType implements Serializable{
         this.smokingAllowed = smokingAllowed;
     }
 
+    public CarType(String companyName, String nextToken, int parseInt, float parseFloat, double parseDouble, boolean parseBoolean) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
     public String getName() {
     	return name;
     }

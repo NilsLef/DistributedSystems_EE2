@@ -12,23 +12,19 @@ import java.util.logging.Logger;
 import static javax.persistence.CascadeType.ALL;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
-import rental.Car;
-import rental.CarType;
-import rental.Quote;
-import rental.Reservation;
-import rental.ReservationConstraints;
-import rental.ReservationException;
+import rental.*;
+
 
 @Entity
 public class CarRentalCompany implements Serializable {
 
     private static Logger logger = Logger.getLogger(CarRentalCompany.class.getName());
-
     @Id
     private String name;
-    @OneToMany(cascade = ALL) //mappedBy?
     private List<Car> cars;
     private Set<CarType> carTypes = new HashSet<CarType>();
     private List<String> regions;
@@ -53,7 +49,6 @@ public class CarRentalCompany implements Serializable {
     /********
      * NAME *
      ********/
-    @Id
     public String getName() {
         return name;
     }
@@ -117,6 +112,7 @@ public class CarRentalCompany implements Serializable {
         throw new IllegalArgumentException("<" + name + "> No car with uid " + uid);
     }
 
+    @OneToMany(cascade = ALL)
     public Set<Car> getCars(CarType type) {
         Set<Car> out = new HashSet<Car>();
         for (Car car : cars) {
@@ -127,6 +123,7 @@ public class CarRentalCompany implements Serializable {
         return out;
     }
     
+    @OneToMany(cascade = ALL)
      public Set<Car> getCars(String type) {
         Set<Car> out = new HashSet<Car>();
         for (Car car : cars) {
@@ -137,6 +134,7 @@ public class CarRentalCompany implements Serializable {
         return out;
     }
     
+@OneToMany(cascade = ALL)
     public List<Car> getCars() {
         return this.cars;
     }
